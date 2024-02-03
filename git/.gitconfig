@@ -1,3 +1,5 @@
 [user]
 	name = Konrad Kusiak
-	email = kkusiak17@gmail.com
+	email = konrad.kusiak@codeplay.com
+[core]
+	editor = vim
