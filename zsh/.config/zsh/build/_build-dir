@@ -1,0 +1,7 @@
+#compdef build-dir
+
+_arguments \
+  '(-h --help)'{-h,--help}'[show this help message and exit]' \
+  '(-s --show)'{-s,--show}'[show the current build directory]' \
+  '--build[invoke a build after selection]' \
+  '1:directory:_files'

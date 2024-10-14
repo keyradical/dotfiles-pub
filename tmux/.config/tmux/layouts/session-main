@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+tmux rename-session main
+tmux rename-window home
+`dirname $0`/window-auto

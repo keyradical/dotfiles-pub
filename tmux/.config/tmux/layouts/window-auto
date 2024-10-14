@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+
+cols=`tmux display -p "#{pane_width}"`
+lines=`tmux display -p "#{pane_height}"`
+width=$(( $cols / 2 )).0
+height=$lines.0
+ratio=$(( ($width / $height) * 100 ))
+
+if [[ $cols -lt 140 ]] && [[ $lines -lt 70 ]]; then
+  # terminal is too small
+  exit
+fi
+
+if [[ $ratio -ge 100 ]]; then
+  # terminal is wide or square
+  if [[ $cols -gt 240 ]]; then
+    # terminal is wide and large
+    `dirname $0`/window-wide-right
+  else
+    # terminal is wide and small
+    tmux split-window -h -c '#{pane_current_path}'
+    tmux select-pane -t 1
+  fi
+else
+  # terminal is tall
+  `dirname $0`/window-tall
+fi

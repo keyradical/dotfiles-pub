@@ -1,0 +1,129 @@
+# .zshenv [0] Used for setting user's environment variables; it should not
+# contain commands that produce output or assume the shell is attached to a
+# tty. This file will always be sourced.
+
+# Enable saving command history to file
+[ ! -d $HOME/.cache/zsh ] && mkdir -p $HOME/.cache/zsh
+HISTFILE=$HOME/.cache/zsh/histfile
+HISTSIZE=20000
+SAVEHIST=20000
+
+# Remove vi mode switch delay
+KEYTIMEOUT=1
+
+# Enable time stats for long lasting commands
+REPORTTIME=5
+
+# Add ~/.local to the environment
+fpath+=$HOME/.local/share/zsh/site-functions
+PATH=$HOME/.local/bin:$PATH
+MANPATH=$HOME/.local/share/man:$MANPATH
+INFOPATH=$HOME/.local/share/info:$INFOPATH
+
+# Add ccache compiler aliases to PATH and use XDG base dir paths
+if [ `uname` = Darwin ]; then
+  if [ `uname -m` = arm64 ]; then
+    homebrew_root=/opt/homebrew
+    [ -d /opt/homebrew/bin ] && \
+      PATH=$homebrew_root/bin:$PATH
+  else
+    homebrew_root=/usr/local
+  fi
+  [ -d $homebrew_root/opt/python/libexec/bin ] && \
+    PATH=$homebrew_root/opt/python/libexec/bin:$PATH
+  [ -f $homebrew_root/bin/ccache ] && \
+    PATH=$homebrew_root/opt/ccache/libexec:$PATH
+elif [ -f /usr/bin/ccache ]; then
+  if [ -d /usr/lib/ccache/bin ]; then
+    PATH=/usr/lib/ccache/bin:$PATH
+  elif [ -d /usr/lib/ccache ]; then
+    PATH=/usr/lib/ccache:$PATH
+  fi
+fi
+export CCACHE_CONFIGPATH=$HOME/.config/ccache
+export CCACHE_DIR=$HOME/.cache/ccache
+
+# Add default CMake generator
+command -v ninja &> /dev/null && \
+  export CMAKE_GENERATOR=Ninja
+export CMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+# Remove duplicates from environment variables
+typeset -U fpath
+typeset -U PATH;      export PATH
+typeset -U MANPATH;   export MANPATH
+typeset -U INFOPATH;  export INFOPATH
+
+# Set default editor.
+if command -v nvim &> /dev/null; then
+  export EDITOR=`command -v nvim`
+  # Also use nvim for man pages
+  export MANPAGER='nvim +Man!'
+elif command -v vim &> /dev/null; then
+  export EDITOR=`command -v vim`
+fi
+export GIT_EDITOR=$EDITOR
+
+if command -v fzf &> /dev/null; then
+  export FZF_DEFAULT_OPTS='--no-bold
+    --color=fg:#c5c9c5,fg+:#c5c9c5,bg:#000000,bg+:#393836
+    --color=hl:#8ea4a2,hl+:#8ea4a2,info:#afaf87,marker:#C8C093
+    --color=prompt:#C8C093,spinner:#8992a7,pointer:#FF9E3B,header:#87afaf
+    --color=gutter:#000000,border:#54546D,label:#aeaeae,query:#c5c9c5'
+fi
+
+# Use ~/.local for pip installs on macOS
+[ "`uname`" = "Darwin" ] && export PYTHONUSERBASE=$HOME/.local
+
+# Change colors used by less and man
+export LESS_TERMCAP_mb=`printf "\e[0;31m"`
+export LESS_TERMCAP_md=`printf "\e[0;36m"`
+export LESS_TERMCAP_me=`printf "\e[0m"`
+export LESS_TERMCAP_so=`printf "\e[1;40;32m"`
+export LESS_TERMCAP_se=`printf "\e[0m"`
+export LESS_TERMCAP_us=`printf "\e[0;34m"`
+export LESS_TERMCAP_ue=`printf "\e[0m"`
+# Disable storing less history
+export LESSHISTFILE=/dev/null
+
+# Force GoogleTest to output colors
+export GTEST_COLOR=yes
+# Allow completions for GoogleTest break on failure
+export GTEST_BREAK_ON_FAILURE=0
+# Force CTest to verbose output
+export CTEST_OUTPUT_ON_FAILURE=1
+
+# User ~/.local/share for persistent pylint data
+export PYLINTHOME=~/.local/share/pylint
+# Disable virtualenv prompt
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# If pinentry-curses exists, use it for lastpass-cli
+command -v pinentry-curses &> /dev/null && \
+  export LPASS_PINENTRY=pinentry-curses
+
+# Teach these some XDG Base Directory Spec manners
+export IPYTHONDIR=$HOME/.config/ipython
+command -v cargo &> /dev/null && \
+  export CARGO_HOME=$HOME/.local/share/cargo
+if command -v ccache &> /dev/null; then
+  export CCACHE_CONFIGPATH=$HOME/.config/ccache.conf
+  export CCACHE_DIR=$HOME/.cache/ccache
+fi
+command -v conan &> /dev/null && \
+  export CONAN_USER_HOME=$HOME/.local/share/conan
+command -v docker &> /dev/null && \
+  export DOCKER_CONFIG=$HOME/.local/share/docker
+export GTK_RC_FILES=$HOME/.config/gtk/gtkrc
+export GTK2_RC_FILES=$HOME/.config/gtk-2.0/gtkrc
+export PYLINTHOME=$HOME/.cache/pylint
+command -v rustup &> /dev/null && \
+  export RUSTUP_HOME=$HOME/.local/share/rustup
+[ -f $HOME/.config/wget/rc ] && \
+  export WGETRC=$HOME/.config/wget/rc
+# TODO: terminfo
+export GOBIN=$HOME/.local/bin
+export GOPATH=$HOME/.local/share/go
+export GOCACHE=$HOME/.cache/go/build
+export GOMODCACHE=$HOME/.cache/go/pkg/mod
+export GOTMPDIR=$HOME/.cache/go/tmp

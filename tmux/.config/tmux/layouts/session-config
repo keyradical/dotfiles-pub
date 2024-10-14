@@ -1,0 +1,28 @@
+#!/usr/bin/env zsh
+
+tmux rename-window home
+
+tmux new-window -c ~/.config/nvim
+tmux rename-window config/nvim
+`dirname $0`/window-auto
+
+tmux new-window -c ~/.config/zsh
+tmux rename-window config/zsh
+`dirname $0`/window-auto
+
+tmux new-window -c ~/.config/tmux
+tmux rename-window config/tmux
+`dirname $0`/window-auto
+
+if [ -d ~/.config/work ]; then
+  tmux new-window -c ~/.config/work
+  tmux rename-window config/work
+  `dirname $0`/window-auto
+fi
+
+tmux new-window -c ~/.config/local
+tmux rename-window config/local
+tmux move-window -s config:config/local -t 9
+`dirname $0`/window-auto
+
+tmux select-window -t config:home

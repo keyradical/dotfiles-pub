@@ -1,0 +1,244 @@
+# .zshrc [2] Used for setting user's interactive shell configuration and
+# executing commands, will be sourced when starting as an interactive shell.
+
+# Load plugin scripts
+source-plugin() {
+  local shared_plugin=~/.local/share/zsh/plugins/$1/$1.plugin.zsh
+  local local_plugin=~/.config/zsh/$1/$1.plugin.zsh
+  if [ -f $shared_plugin ]; then
+    source $shared_plugin
+  elif [ -f $local_plugin ]; then
+    source $local_plugin
+  else
+    echo "zsh plugin not found: $1"
+  fi
+}
+
+# Add neo vim to PATH
+export PATH="$PATH:/opt/nvim-linux64/bin"
+# Fish like automatic suggestions from command history
+source-plugin zsh-autosuggestions
+# Disable non end-of-line autosuggest accept widgets
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(end-of-line vi-end-of-line)
+
+# Search history with a command substring
+source-plugin zsh-history-substring-search
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND=
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND=
+
+# Command syntax highlighting
+source-plugin zsh-syntax-highlighting
+(( ${+ZSH_HIGHLIGHT_STYLES} )) || typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[precommand]=fg=green
+
+# Build system helper commands
+source-plugin build
+
+# Project sandboxing commands
+source-plugin sandbox
+
+# Various shell utilities
+source-plugin utilities
+
+# Automatically source .enter and .exit scripts on cd
+source-plugin autoenv
+
+# Session manager
+source-plugin session
+
+# Layout tmux window commands
+[ "$TMUX" != "" ] && source-plugin layout
+
+# Note taking commands
+source-plugin notes
+
+# Remove duplicates from history
+setopt histignoredups
+
+# Enable multi-terminal history
+setopt share_history
+
+# Disable error when no glob matches are found
+setopt nonomatch
+
+# Enable comments in the prompt
+setopt interactive_comments
+
+# Disable '<Ctrl>D' to logout
+# setopt ignore_eof
+
+# Disable sound
+setopt nobeep
+
+# Disable tty flow control, allows vim to use '<Ctrl>S'
+setopt noflowcontrol; stty -ixon
+
+# Enable completions in the middle of a word
+setopt completeinword
+
+# Initialize completions
+autoload -U compinit
+compinit -d ~/.cache/zsh/compdump
+
+# Add pip to the old completion engine if present
+if command -v pip &> /dev/null; then
+  function _pip_completion {
+    local words cword
+    read -Ac words
+    read -cn cword
+    reply=( $( COMP_WORDS="$words[*]" \
+               COMP_CWORD=$(( cword-1 )) \
+               PIP_AUTO_COMPLETE=1 $words[1] ) )
+  }
+  compctl -K _pip_completion pip
+fi
+
+# Enable prompt themes
+autoload -Uz promptinit
+promptinit
+prompt fresh
+
+# Enable vi mode line editor keymap
+bindkey -v
+
+# Enable backspace after returning to viins from vicmd mode
+bindkey '^?' backward-delete-char
+
+# Enable yank, change, and delete whole line with 'Y', 'cc', and 'dd'
+bindkey -M vicmd 'Y' vi-yank-whole-line
+
+# Edit the command line in vim
+bindkey -M vicmd '^F' edit-command-line
+
+# Enable undo with 'u' and redo with 'U'
+bindkey -M vicmd 'u' undo
+bindkey -M vicmd 'U' redo
+
+# Enable toggle comment at start of line al la vim-commentary
+bindkey -M vicmd 'gcc' vi-pound-insert
+
+# TODO: vi-pipe???
+
+# Enable accepting autosuggestions
+bindkey '^O' forward-word
+bindkey '^P' autosuggest-accept
+
+# Enable substring history search with 'j' and 'k'
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
+# Replace '<Esc>h' with 'K' to view help
+bindkey -r '^[h'
+bindkey -M vicmd 'K' run-help
+
+# Enable '<Shirt><Tab>' reverse order completions
+bindkey '^[[Z' reverse-menu-complete
+
+# Use editor to edit command line with '<Ctrl>V'
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd '^V' edit-command-line
+
+# Enable HOME and END keys
+if [[ `uname` = Linux ]]; then
+  # If Home and End are not working as expected setup zkbd mappings.
+  [ -f ~/.zkbd/$TERM-${${DISPLAY:t}:-$VENDOR-$OSTYPE} ] && \
+    source ~/.zkbd/$TERM-${${DISPLAY:t}:-$VENDOR-$OSTYPE}
+  [[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
+  [[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
+fi
+
+# Enable changing cursor shape based on vi mode
+if [ "$ITERM_PROFILE" != "" ] && [ "$TMUX" = "" ]; then
+  # iTerm2 cursor shape escape sequences outside tmux
+  cursor_block="\e]50;CursorShape=0\C-G"
+  cursor_line="\e]50;CursorShape=1\C-G"
+else
+  # iTerm2 inside tmux or VTE compatible cursor shape escape sequences.
+  cursor_block="\e[2 q"
+  cursor_line="\e[6 q"
+fi
+
+if [[ ! -z "$cursor_block" && ! -z "$cursor_line" ]]; then
+  # Change cursor shape when vi mode changes
+  function zle-keymap-select zle-line-init {
+    case $KEYMAP in
+      vicmd)      print -n -- "$cursor_block" ;;
+      viins|main) print -n -- "$cursor_line" ;;
+    esac
+    zle reset-prompt
+    zle -R
+  }
+
+  # Change cursor shape when line editing is finished
+  function zle-line-finish { print -n -- "$cursor_block" }
+
+  # Register cursor shape hooks
+  zle -N zle-keymap-select
+  zle -N zle-line-init
+  zle -N zle-line-finish
+fi
+
+# Frequntly used directories
+function frequent-directory() {
+  if [ -d "$2" ]; then
+    # Replace - with _ in environment variable name.
+    local name=${1//-/_}
+    local value=$2
+    export $name=$value
+    hash -d $1
+  fi
+}
+frequent-directory Desktop "$HOME/Desktop"
+frequent-directory Documents "$HOME/Documents"
+frequent-directory Downloads "$HOME/Downloads"
+frequent-directory Development "$HOME/Development"
+frequent-directory Sandbox "$HOME/Sandbox"
+frequent-directory cache "$HOME/.cache"
+frequent-directory config "$HOME/.config"
+frequent-directory local "$HOME/.local"
+
+# Load work related config
+[ -f ~/.config/work/zshrc ] && source ~/.config/work/zshrc
+[ -f ~/.config/private/zshrc ] && source ~/.config/private/zshrc
+[ -f ~/.config/zsh/local ] && source ~/.config/zsh/local
+
+# Aliases
+alias grep='grep --color=always'
+command -v cmake &> /dev/null && \
+  alias cninja='cmake -GNinja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON'
+command -v ssh &> /dev/null && \
+  alias ssh='TERM=xterm-256color ssh'
+alias weather="curl wttr.in"
+alias cls="clear && printf '\e[3J'"
+alias gs='git status'
+
+case `uname` in
+  Linux)
+    alias ls='ls -F --color=auto'
+    if command -v cgdb &> /dev/null; then
+      alias debug='cgdb --args'
+    elif command -v gdb &> /dev/null; then
+      alias debug='gdb --args'
+    fi
+    ;;
+  Darwin)
+    alias ls='ls -GFh'
+    command -v lldb &> /dev/null && \
+      alias debug='lldb --'
+    ;;
+esac
+
+command -v wol > /dev/null && \
+  alias wakeonlan='wol'
+
+# Append any aliases to notify_ignore_list if they contain any ignore commands
+# NOTE: Keep this at the end of ~/.zshrc so all aliases are processed
+for name in ${(k)aliases}; do
+  cmd=${${${$(alias $name)#${name}=}#\'}#\"}
+  for ignore in $notify_ignore_list; do
+    if [[ "$cmd" = "$ignore"* ]]; then
+      notify_ignore_list+=( $name )
+    fi
+  done
+done

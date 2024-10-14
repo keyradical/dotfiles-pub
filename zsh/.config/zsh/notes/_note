@@ -1,0 +1,13 @@
+#compdef note
+
+__get_notes() {
+  ls -1 ~/Sync/Notes 2>/dev/null | while read -r note; do echo $note; done
+}
+
+__notes() {
+  local -a notes
+  notes=(${(fo)"$(__get_notes)"})
+  _describe 'notes' notes
+}
+
+_arguments ':notes:__notes'

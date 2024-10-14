@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+tmux rename-window home
+
+for entry in ~/Projects/infra/*; do
+  if [ ! -d $entry ]; then
+    continue
+  fi
+  tmux new-window -c $entry
+  tmux rename-window $(basename $entry)
+  `dirname $0`/window-auto
+done

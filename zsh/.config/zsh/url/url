@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+"""URL encode or decode text."""
+
+from argparse import ArgumentParser
+from urllib import parse
+
+
+def main():
+    cli = ArgumentParser(description=__doc__)
+    cli.add_argument('command',
+                     choices=['encode', 'decode'],
+                     help='type of processing to perform on text')
+    cli.add_argument('text',
+                     nargs='?',
+                     help='optional text read from stdin when omitted')
+    args = cli.parse_args()
+    print({
+        'encode': parse.quote_plus,
+        'decode': parse.unquote_plus,
+    }[args.command](args.text if args.text else input()))
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit(130)

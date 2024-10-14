@@ -1,0 +1,14 @@
+#compdef layout
+
+__get_layouts() {
+  ls -1 ~/.local/share/tmux/layouts 2>/dev/null | \
+    while read -r layout; do echo $layout; done
+}
+
+__layouts() {
+  local -a layouts
+  layouts=(${(fo)"$(__get_layouts)"})
+  _describe 'layout' layouts
+}
+
+_arguments ':layout:__layouts'

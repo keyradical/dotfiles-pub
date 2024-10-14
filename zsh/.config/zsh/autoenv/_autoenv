@@ -1,0 +1,27 @@
+#compdef autoenv
+
+# Completion for the autoenv command.
+_autoenv() {
+  local ret=1 context curcontext="$curcontext" state line
+  typeset -A opt_args
+
+  _arguments -C -w -s \
+    '(-h --help)'{-h,--help}'[show this help message and exit]' \
+    '1: :->command'
+
+  case $state in
+    (command)
+      declare -a commands
+      local commands=(
+        init:'add .enter and .exit scripts in current directory'
+        edit:'edit .enter and .exit scripts in current directory'
+        deinit:'remove .enter and .exit scripts in current directory'
+        reload:'reload the current environment'
+        add=local:'add .local/bin to PATH'
+        add=py:'add Python virtualenv to the autoenv'
+      )
+      _describe -t commands command commands && ret=0 ;;
+  esac
+
+  return ret
+}

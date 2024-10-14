@@ -1,0 +1,206 @@
+# Tokyo Night Moon Pallette
+blue=#7aa2f7    #(Primary blue tone)
+cyan=#7dcfff    #(Light cyan)
+purple=#bb9af7  #(Vibrant purple)
+magenta=#ff9e64 #(Orange-pinkish)
+green=#9ece6a   #(Bright green)
+teal=#73daca
+
+prompt_fresh_help() {
+  echo "\
+options:
+        -a      enable almostontop like behaviour
+        -r      recompile git-prompt executable"
+}
+
+prompt_fresh_setup() {
+  # Parse options
+  local almostontop=0
+  local recompile=0
+  while getopts 'ar' opt; do
+    case $opt in
+      a) local almostontop=1 ;;
+      r) local recompile=1 ;;
+      *) prompt -h fresh; return 1 ;;
+    esac
+  done
+
+  autoload -U add-zsh-hook
+
+  # Hook to print the first line of the "two line" prompt, this line is not
+  # actually part of the prompt so does not get redrawn, this is preferable
+  # since sometimes lines before the prompt can disappear.
+  add-zsh-hook precmd fresh_line_one
+
+  if [ $almostontop -eq 1 ]; then
+    # Hook to clear the screen then prints the prompt with previous command at
+    # the top of the screen.
+    add-zsh-hook precmd fresh_almostontop_precmd
+    add-zsh-hook preexec fresh_almostontop_preexec
+  else
+    add-zsh-hook -d preexec fresh_almostontop_preexec
+    add-zsh-hook -d precmd fresh_almostontop_precmd
+  fi
+
+  [ $recompile -eq 1 ] && prompt_cleanup
+  fresh_compile_git_prompt
+
+
+  if [ "$USER" = "root" ]; then
+    local user="%{%F{1}%}%n%{%f%}"
+  else
+    local user="%{%F{$blue}%}%n%{%f%}"
+  fi
+
+  local userhost=$USER
+  if [ "$SSH_CONNECTION" != "" ] || [ "$container" != "" ]; then
+    local user="$user@%{%F{$purple}%}%M%{%f%}"
+    local userhost="$userhost@`hostname`"
+  fi
+
+  PS1="$user "
+  PS2="${(l:${#userhost}:: :)} "
+
+  prompt_opts=(percent sp subst)
+}
+
+prompt_cleanup() {
+  [ -f ${XDG_CACHE_HOME:-$HOME/.cache}/zsh/git-prompt ] && \
+    rm ${XDG_CACHE_HOME:-$HOME/.cache}/zsh/git-prompt
+}
+
+fresh_line_one() {
+  # First get the last commands exit code before doing anything
+  local exit_code=$?
+
+  # Clean up if fresh is no longer the current prompt theme
+  if [[ "`prompt -c | tail -1 | xargs`" != "fresh"* ]]; then
+    add-zsh-hook -d precmd fresh_line_one
+    return
+  fi
+
+  # Construct the time and directory portions of the prompt
+  local time_stamp="%{%F{244}%}%D{%H:%M:%S}%{%f%}"
+  [[ -n $SANDBOX_HOME ]] && \
+    local directory="%{%F{220}%}$SANDBOX_NAME${PWD#$SANDBOX_HOME}%{%f%}" || \
+    local directory="%{%F{$cyan}%}%~%{%f%}"
+
+  # Check we are in a git repository
+  local git=`${XDG_CACHE_HOME:-$HOME/.cache}/zsh/git-prompt`
+
+  # If the last command failed, display its error code at the right
+  if [[ $exit_code -ne 0 ]]; then
+    case $exit_code in
+      129) exit_code="SIGHUP"     ;;  # 128 + 1
+      130) exit_code="SIGINT"     ;;  # 128 + 2
+      131) exit_code="SIGQUIT"    ;;  # 128 + 3
+      132) exit_code="SIGILL"     ;;  # 128 + 4
+      133) exit_code="SIGTRAP"    ;;  # 128 + 5
+      134) exit_code="SIGABRT"    ;;  # 128 + 6
+      134) exit_code="SIGIOT"     ;;  # 128 + 6
+      135) exit_code="SIGBUS"     ;;  # 128 + 7
+      136) exit_code="SIGFPE"     ;;  # 128 + 8
+      137) exit_code="SIGKILL"    ;;  # 128 + 9
+      138) exit_code="SIGUSR1"    ;;  # 128 + 10
+      139) exit_code="SIGSEGV"    ;;  # 128 + 11
+      140) exit_code="SIGUSR2"    ;;  # 128 + 12
+      141) exit_code="SIGPIPE"    ;;  # 128 + 13
+      142) exit_code="SIGALRM"    ;;  # 128 + 14
+      143) exit_code="SIGTERM"    ;;  # 128 + 15
+      144) exit_code="SIGSTKFLT"  ;;  # 128 + 16
+      145) exit_code="SIGCHLD"    ;;  # 128 + 17
+      146) exit_code="SIGCONT"    ;;  # 128 + 18
+      147) exit_code="SIGSTOP"    ;;  # 128 + 19
+      148) exit_code="SIGTSTP"    ;;  # 128 + 20
+      149) exit_code="SIGTTIN"    ;;  # 128 + 21
+      150) exit_code="SIGTTOU"    ;;  # 128 + 22
+      151) exit_code="SIGURG"     ;;  # 128 + 23
+      152) exit_code="SIGXCPU"    ;;  # 128 + 24
+      153) exit_code="SIGXFSZ"    ;;  # 128 + 25
+      154) exit_code="SIGVTALRM"  ;;  # 128 + 26
+      155) exit_code="SIGPROF"    ;;  # 128 + 27
+      156) exit_code="SIGWINCH"   ;;  # 128 + 28
+      157) exit_code="SIGIO"      ;;  # 128 + 29
+      158) exit_code="SIGPWR"     ;;  # 128 + 30
+      159) exit_code="SIGSYS"     ;;  # 128 + 31
+    esac
+    local result=" %{%B%F{1}%}$exit_code%{%f%b%}"
+  fi
+
+  # Unset vim/tmux navigate flag to handle C-z and multiple vim jobs.
+  [[ ! -z "$TMUX" ]] && \
+    [[ "`tmux show-window-options`" = *"@vim$TMUX_PANE"* ]] && \
+      tmux set-window-option -u @vim$TMUX_PANE
+
+  # If a virtualenv is enabled, display it's basename
+  if [[ ! -z "$VIRTUAL_ENV" ]]; then
+    local py=" %{%F{4}%}py%{%f%}%{%F{3}%}$(basename $VIRTUAL_ENV)%{%f%}"
+  fi
+
+  # If docker-machine env is active, display the machines name
+  if [[ ! -z "$DOCKER_MACHINE_NAME" ]]; then
+    local docker=" %{%F{6}%}$DOCKER_MACHINE_NAME%{%f%}"
+  fi
+
+  # Print the first line of the prompt
+  print -P "$time_stamp $directory$git$py$docker$result"
+}
+
+# Executed before each prompt.
+fresh_almostontop_precmd() {
+  # CSI ESC[6n gets the cursor position in the form ESC[<row>;<column>R
+  printf "\033[6n"
+  # Discard prefix delimited by [
+  read -s -d [
+  # Store the <row> delimited by ; in row_before
+  read -s -d \; row_before
+  # Discard suffix delimted by R otherwise it is output to the tty
+  read -s -d R
+}
+
+# Executed just after a command has been read and is about to be executed.
+fresh_almostontop_preexec() {
+  # CSI ESC[6n gets the cursor position in the form ESC[<row>;<column>R
+  printf "\033[6n"
+  # Discard prefix delimited by [
+  read -s -d [
+  # Store the <row> delimited by ; in row
+  read -s -d \; row
+  # Discard suffix delimted by R otherwise it is output to the tty
+  read -s -d R
+  # Move the cursor to the bottom of the terminal
+  # CSI ESC[<num>B moves the cursor down <num> lines
+  let "down = $LINES - $row"
+  printf "\033[${down}B"
+  # Calculate the number of lines in the prompt
+  let "prompt_lines = ($row - $row_before) + 2"
+  # Print new lines to push the old command out of view
+  let "new = $row - $prompt_lines"
+  for (( i = 0; i < $new; i++ )); do
+    printf "\n"
+  done
+  # Move the cursor to the line below the prompt
+  # CSI ESC[<num>A moves the cursor up <num> lines
+  let "up = $LINES - $prompt_lines"
+  printf "\033[${up}A"
+}
+
+fresh_compile_git_prompt() {
+  # Compile a simple C program which parses the output of `git status
+  # --procelain` to greatly decrease the time taken to draw the prompt
+  [ ! -d ${XDG_CACHE_HOME:-$HOME/.cache}/zsh ] && \
+    mkdir -p ${XDG_CACHE_HOME:-$HOME/.cache}/zsh
+  if [ ! -f ${XDG_CACHE_HOME:-$HOME/.cache}/zsh/git-prompt ]; then
+    cc -std=gnu99 -O3 -DNDEBUG -Wno-unused-result \
+      ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/git-prompt.c \
+      -o ${XDG_CACHE_HOME:-$HOME/.cache}/zsh/git-prompt
+    if [ $? -ne 0 ]; then
+      echo "git-prompt was not compiled, is a C99 toolchain installed?"
+    fi
+  fi
+}
+
+prompt_fresh_setup "$@"
+
+# vim:ft=zsh
+
