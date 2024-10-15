@@ -29,7 +29,7 @@ fi
 
 # Interactively choose a `~build` directory for `build` to build.
 build-dir() {
-  local usage='usage: build-dir [-h] [--build] [<directory>]'
+  local usage='usage: build-dir [-h] [-s] [--build] [<directory>]'
   local -a help show do_build
   zparseopts -D h=help -help=help s=show -show=show -build=do_build
   if [[ -n $help ]]; then
@@ -62,7 +62,7 @@ EOF
   local local_build_dir
   if [[ ${#*} -gt 1 ]]; then
     echo $usage
-    error "unexpected position arguments: ${*[2,${#*}]}"; return 1
+    error "unexpected positional arguments: ${*[2,${#*}]}"; return 1
   elif [[ ${#*} -eq 1 ]]; then
     if [[ ! -d ${*[1]} ]]; then
       warning "directory not found: ${*[1]}"

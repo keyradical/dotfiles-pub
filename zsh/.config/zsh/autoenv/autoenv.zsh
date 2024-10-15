@@ -137,16 +137,22 @@ zmodload -F zsh/stat b:zstat
 
 # Check if the given file is authorized, if not prompt the user to authorize,
 # ignore, or view the file. Authorized files and their modified times are
-# stored in the ~/.cache/autoenv/authorized file to make authorization
+# stored in the $XDG_STATE_HOME/autoenv/authorized file to make authorization
 # persistent.
 _autoenv_authorized() {
   local file=$1 yes=$2
-  # If autoenv cache directory does not exist, create it.
-  ! [ -d ~/.cache/autoenv ] && mkdir -p ~/.cache/autoenv
+  # If autoenv state directory does not exist, create it.
+  ! [ -d ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv ] && \
+    mkdir -p ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv
+  # Migrate from cache to state directory
+  [ -f $HOME/.cache/autoenv/authorized ] && \
+    mv $HOME/.cache/autoenv/authorized \
+       ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv/authorized
   # If the authorized file does not exist, create it.
-  ! [ -f ~/.cache/autoenv/authorized ] && touch ~/.cache/autoenv/authorized
+  ! [ -f ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv/authorized ] && \
+    touch ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv/authorized
   # Load the authorized file into a map of authorized key value pairs.
-  typeset -A authorized=(`cat ~/.cache/autoenv/authorized`)
+  typeset -A authorized=(`cat ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv/authorized`)
   # If the file has been removed, return.
   ! [ -f $file ] && return 1
   # If the given file has been authorized, i.e. the modified time matches that
@@ -168,7 +174,7 @@ _autoenv_authorized() {
   # Add file to the authorized map.
   authorized[$file]=$modified_time
   # Store authorized map in authorized file.
-  echo ${(kv)authorized} > ~/.cache/autoenv/authorized
+  echo ${(kv)authorized} > ${XDG_STATE_HOME:-$HOME/.local/state}/autoenv/authorized
 }
 
 # Source an enter script and add its directory to the global entered

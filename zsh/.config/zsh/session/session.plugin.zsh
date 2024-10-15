@@ -8,6 +8,12 @@ session() {
       echo "$fg[red]error:$reset_color invalid argument: $3"
       return 1
     fi
+    declare -A hosts
+    if [ -f ~/.config/session ]; then
+      source ~/.config/session
+    fi
+    local url=$hosts[$host]
+    host=${url:-$host}
     if [[ "$TMUX" == "" ]]; then
       local cmd="tmux new-session -As $name"
       if [[ "$host" != "" ]]; then

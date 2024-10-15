@@ -1,0 +1,32 @@
+#compdef session
+
+__session_sessions() {
+  list() {
+    for item in $HOME/.local/share/tmux/layouts/session-*; do
+      item=${item#$HOME/.local/share/tmux/layouts/}
+      echo ${item#session-}
+    done
+  }
+  local -a sessions
+  sessions=(${(fo)"$(list)"})
+  _describe 'session' sessions
+}
+
+__session_hosts() {
+  list() {
+    declare -A hosts
+    if [ -f ~/.config/session ]; then
+      source ~/.config/session
+      for key val in "${(@kv)hosts}"; do
+        echo $key
+      done
+    fi
+  }
+  local -a hosts
+  hosts=(${(fo)"$(list)"})
+  _describe 'host' hosts
+}
+
+_arguments \
+  ':session:__session_sessions' \
+  ':host:__session_hosts'

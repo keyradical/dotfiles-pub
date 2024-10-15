@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Uninstall a previously installed CMake installation.
+
+Read the ``install_manifest.txt`` file from a CMake build directory
+which has been installed then delete the files, and optionally the empty
+subdirectories of the install prefix, specified within.
+"""
+
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from os import listdir, path, remove, rmdir
+from sys import stderr
+
+
+def uninstall(build_dir, recursive=False):
+    """Uninstall a previoulsy installed CMake installation.
+
+    Arguments:
+        :build_dir: Path to the build directory containing the
+        ``install_manifest.txt`` of files to uninstall.
+        :recursive: Boolean flag to enable recursively uninstall empty
+        directories up to the install prefix specified in ``CMakeCache.txt``.
+    """
+    # Get the list of installed files from the install_manifest.txt
+    install_manifest_path = path.join(build_dir, 'install_manifest.txt')
+    with open(install_manifest_path, 'r') as install_manifest_file:
+        install_manifest = sorted(install_manifest_file.read().splitlines())
+    # Delete files from the filesystem
+    removed = []
+    directories = []
+    for entry in install_manifest:
+        directories.append(path.dirname(entry))
+        if path.isfile(entry):
+            remove(entry)
+            removed.append(entry)
+    if recursive:
+        # Get the install prefix from CMakeCache.txt
+        cmakecache_path = path.join(build_dir, 'CMakeCache.txt')
+        with open(cmakecache_path, 'r') as cmakecache_file:
+            for line in cmakecache_file.read().splitlines():
+                if line.startswith('CMAKE_INSTALL_PREFIX'):
+                    prefix = path.normpath(line.split('=')[1])
+                    break
+        while True:
+            # Remove duplicates from list
+            directories = list(dict.fromkeys(directories))
+            # Find directories in list which are not empty
+            not_empty = []
+            for index, entry in enumerate(directories):
+                if listdir(entry):
+                    not_empty.append(index)
+            # Remove directories which are not empty from list
+            for index in reversed(not_empty):
+                del directories[index]
+            # Delete directories from the filesystem
+            to_del = []
+            to_append = []
+            for index, entry in enumerate(directories):
+                rmdir(entry)
+                removed.append(entry)
+                to_del.append(index)
+                parent = path.dirname(entry)
+                # Add parent directory to the list when not the install prefix
+                if path.normpath(parent) != prefix:
+                    to_append.append(parent)
+            # Remove deleted directories from list
+            for index in reversed(to_del):
+                del directories[index]
+            directories += to_append
+            # Exit loop when no more directories in list
+            if not directories:
+                break
+    return removed
+
+
+def main():
+    """Command line entry point."""
+    cli = ArgumentParser(description=__doc__,
+                         formatter_class=RawDescriptionHelpFormatter)
+    cli.add_argument('--version', action='version', version='%(prog)s 0.1.0')
+    cli.add_argument('-q',
+                     '--quiet',
+                     action='store_true',
+                     help="don't print removed entries to stdout")
+    cli.add_argument('-r',
+                     '--recursive',
+                     action='store_true',
+                     help='recursively remove empty directories')
+    cli.add_argument('build_dir',
+                     help='path to the installed CMake build directory')
+    args = cli.parse_args()
+    try:
+        removed = uninstall(args.build_dir, recursive=args.recursive)
+        if not args.quiet:
+            for entry in removed:
+                print(f'-- Uninstalling: {entry}')
+    except FileNotFoundError as error:
+        print(f'error: file not found: {error.filename}', file=stderr)
+        exit(1)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit(130)

@@ -202,4 +202,3 @@ int main() {
   puts(prompt);
   return 0;
 }
-

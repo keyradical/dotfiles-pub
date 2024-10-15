@@ -31,7 +31,8 @@ for plugin in $plugins; do
       error $plugin_directory contains unstaged changes
     fi
     pull=`git -C $plugin_directory pull`
-    if [ "$pull" != "Already up-to-date." ]; then
+    if [ "$pull" != "Already up to date." ] && \
+       [ "$pull" != "Already up-to-date." ]; then
       echo changed pulled $plugin_directory
     fi
   else
@@ -53,7 +54,7 @@ symlinks=(
   ~/.config/zsh/zshenv ~/.zshenv
   ~/.config/zsh/zshrc ~/.zshrc
   ~/.config/zsh/prompt_fresh_setup
-    ~/.local/share/zsh/site-functions/prompt_fresh_setup
+  ~/.local/share/zsh/site-functions/prompt_fresh_setup
   ~/.config/zsh/cmake-uninstall ~/.local/bin/cmake-uninstall
   ~/.config/zsh/$ ~/.local/bin/$
   ~/.config/zsh/url/url ~/.local/bin/url
