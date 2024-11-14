@@ -16,6 +16,10 @@ source-plugin() {
 
 # Add neo vim to PATH
 export PATH="$PATH:/opt/nvim-linux64/bin"
+
+# Add cargo to PATH
+export PATH="$PATH":"/home/konrad/.local/share/cargo/bin"
+
 # Fish like automatic suggestions from command history
 source-plugin zsh-autosuggestions
 # Disable non end-of-line autosuggest accept widgets
@@ -32,10 +36,10 @@ source-plugin zsh-syntax-highlighting
 ZSH_HIGHLIGHT_STYLES[precommand]=fg=green
 
 # Build system helper commands
-source-plugin build
+# source-plugin build
 
 # Project sandboxing commands
-source-plugin sandbox
+# source-plugin sandbox
 
 # Various shell utilities
 source-plugin utilities
@@ -94,35 +98,35 @@ if command -v pip &> /dev/null; then
 fi
 
 # Enable prompt themes
-autoload -Uz promptinit
-promptinit
-prompt fresh
+# autoload -Uz promptinit
+# promptinit
+# prompt fresh
 
 # Enable vi mode line editor keymap
-bindkey -v
-
-# Enable backspace after returning to viins from vicmd mode
-bindkey '^?' backward-delete-char
-
-# Enable yank, change, and delete whole line with 'Y', 'cc', and 'dd'
-bindkey -M vicmd 'Y' vi-yank-whole-line
-
-# Edit the command line in vim
-bindkey -M vicmd '^F' edit-command-line
-
-# Enable undo with 'u' and redo with 'U'
-bindkey -M vicmd 'u' undo
-bindkey -M vicmd 'U' redo
-
-# Enable toggle comment at start of line al la vim-commentary
-bindkey -M vicmd 'gcc' vi-pound-insert
+# bindkey -v
+#
+# # Enable backspace after returning to viins from vicmd mode
+# bindkey '^?' backward-delete-char
+#
+# # Enable yank, change, and delete whole line with 'Y', 'cc', and 'dd'
+# bindkey -M vicmd 'Y' vi-yank-whole-line
+#
+# # Edit the command line in vim
+# bindkey -M vicmd '^F' edit-command-line
+#
+# # Enable undo with 'u' and redo with 'U'
+# bindkey -M vicmd 'u' undo
+# bindkey -M vicmd 'U' redo
+#
+# # Enable toggle comment at start of line al la vim-commentary
+# bindkey -M vicmd 'gcc' vi-pound-insert
 
 # TODO: vi-pipe???
 
 # Enable accepting autosuggestions
-bindkey '^O' forward-word
-bindkey '^P' autosuggest-accept
-
+# bindkey '^O' forward-word
+# bindkey '^P' autosuggest-accept
+#
 # Enable substring history search with 'j' and 'k'
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
@@ -138,15 +142,6 @@ bindkey '^[[Z' reverse-menu-complete
 autoload -U edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd '^V' edit-command-line
-
-# Enable HOME and END keys
-if [[ `uname` = Linux ]]; then
-  # If Home and End are not working as expected setup zkbd mappings.
-  [ -f ~/.zkbd/$TERM-${${DISPLAY:t}:-$VENDOR-$OSTYPE} ] && \
-    source ~/.zkbd/$TERM-${${DISPLAY:t}:-$VENDOR-$OSTYPE}
-  [[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
-  [[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
-fi
 
 # Enable changing cursor shape based on vi mode
 if [ "$ITERM_PROFILE" != "" ] && [ "$TMUX" = "" ]; then
@@ -198,11 +193,6 @@ frequent-directory cache "$HOME/.cache"
 frequent-directory config "$HOME/.config"
 frequent-directory local "$HOME/.local"
 
-# Load work related config
-[ -f ~/.config/work/zshrc ] && source ~/.config/work/zshrc
-[ -f ~/.config/private/zshrc ] && source ~/.config/private/zshrc
-[ -f ~/.config/zsh/local ] && source ~/.config/zsh/local
-
 # Aliases
 alias grep='grep --color=always'
 command -v cmake &> /dev/null && \
@@ -242,3 +232,6 @@ for name in ${(k)aliases}; do
     fi
   done
 done
+
+# Load Starship prompt
+eval "$(starship init zsh)"

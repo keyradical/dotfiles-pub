@@ -18,6 +18,7 @@ if true then
     },
   }
 end
+
 return {
   -- Configure LazyVim to load gruvbox
   {

@@ -5,10 +5,6 @@
 #: kitty has very powerful font management. You can configure
 #: individual font faces and even specify special fonts for particular
 #: characters.
-font_family      CaskaydiaCove Nerd Font Light
-bold_font        CaskaydiaCove Nerd Font Regular
-italic_font      CaskaydiaCove Nerd Font Light Italic
-bold_italic_font CaskaydiaCove Nerd Font Italic
 
 #: You can specify different fonts for the bold/italic/bold-italic
 #: variants. To get a full list of supported fonts use the `kitty
@@ -22,7 +18,7 @@ bold_italic_font CaskaydiaCove Nerd Font Italic
 #:     italic_font      Operator Mono Book Italic
 #:     bold_italic_font Operator Mono Medium Italic
 
-font_size 12
+font_size 15
 
 #: Font size (in pts)
 
@@ -1451,3 +1447,11 @@ include kitty.d/local.conf
 # Tokyo Night
 include current-theme.conf
 # END_KITTY_THEME
+
+
+# BEGIN_KITTY_FONTS
+font_family      family="JetBrainsMono Nerd Font"
+bold_font        family='JetBrainsMono Nerd Font' style=Bold
+italic_font      auto
+bold_italic_font auto
+# END_KITTY_FONTS

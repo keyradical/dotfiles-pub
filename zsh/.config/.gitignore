@@ -1,4 +1,0 @@
-# Ignore all plugin files in subdirectories
-zsh-*/
-local
-zsh*.local
