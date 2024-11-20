@@ -129,47 +129,47 @@ extract() {
   fi
 }
 
-if which bat &> /dev/null; then
-  # Wrap bat to specify a theme, always enable color, pipe the output to less.
-  # Both --theme and --color can be specified multiple times and will override
-  # these defaults.
-  bat() {
-    command bat --theme='TwoDark' --color always --paging auto "$@"
-  }
-elif which batcat &> /dev/null; then
-  bat() {
-    command batcat --theme='TwoDark' --color always --paging auto "$@"
-  }
-fi
+# if which bat &> /dev/null; then
+#   # Wrap bat to specify a theme, always enable color, pipe the output to less.
+#   # Both --theme and --color can be specified multiple times and will override
+#   # these defaults.
+#   bat() {
+#     command bat --theme='TwoDark' --color always --paging auto "$@"
+#   }
+# elif which batcat &> /dev/null; then
+#   bat() {
+#     command batcat --theme='TwoDark' --color always --paging auto "$@"
+#   }
+# fi
 
-if which docker-machine &> /dev/null; then
-  # Wrap the docker command to print a message if a docker-machine is not
-  # running, rather than just stating it can not find it's socket.
-  docker() {
-    command docker "$@"
-    if ! docker-machine active &> /dev/null; then
-      echo "$fg[red]error:$reset_color no active host found, run:" \
-           "docker-machine start <machine>"
-      return 1
-    fi
-  }
+# if which docker-machine &> /dev/null; then
+#   # Wrap the docker command to print a message if a docker-machine is not
+#   # running, rather than just stating it can not find it's socket.
+#   docker() {
+#     command docker "$@"
+#     if ! docker-machine active &> /dev/null; then
+#       echo "$fg[red]error:$reset_color no active host found, run:" \
+#            "docker-machine start <machine>"
+#       return 1
+#     fi
+#   }
 
   # Wrap the docker-machine command to automatically update the environment.
   # When a machine is started, set the environment variables provided by
   # docker-machine env <machine>. When a machine is stopped, unset the same
   # variables.
-  docker-machine() {
-    command docker-machine "$@"
-    if [ "start" = "$1" ]; then
-      eval `docker-machine env $2`
-    elif [ "stop" = "$1" ]; then
-      unset DOCKER_MACHINE_NAME
-      unset DOCKER_CERT_PATH
-      unset DOCKER_HOST
-      unset DOCKER_TLS_VERIFY
-    fi
-  }
-fi
+#   docker-machine() {
+#     command docker-machine "$@"
+#     if [ "start" = "$1" ]; then
+#       eval `docker-machine env $2`
+#     elif [ "stop" = "$1" ]; then
+#       unset DOCKER_MACHINE_NAME
+#       unset DOCKER_CERT_PATH
+#       unset DOCKER_HOST
+#       unset DOCKER_TLS_VERIFY
+#     fi
+#   }
+# fi
 
 ls-iommu() {
   $HOME/.config/zsh/ls-iommu.sh | sort -n

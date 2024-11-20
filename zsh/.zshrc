@@ -1,6 +1,9 @@
 # .zshrc [2] Used for setting user's interactive shell configuration and
 # executing commands, will be sourced when starting as an interactive shell.
 
+# Load Starship prompt
+eval "$(starship init zsh)"
+
 # Load plugin scripts
 source-plugin() {
   local shared_plugin=~/.local/share/zsh/plugins/$1/$1.plugin.zsh
@@ -54,7 +57,7 @@ source-plugin session
 [ "$TMUX" != "" ] && source-plugin layout
 
 # Note taking commands
-source-plugin notes
+# source-plugin notes
 
 # Remove duplicates from history
 setopt histignoredups
@@ -103,40 +106,40 @@ fi
 # prompt fresh
 
 # Enable vi mode line editor keymap
-# bindkey -v
+bindkey -v
 #
-# # Enable backspace after returning to viins from vicmd mode
-# bindkey '^?' backward-delete-char
-#
-# # Enable yank, change, and delete whole line with 'Y', 'cc', and 'dd'
-# bindkey -M vicmd 'Y' vi-yank-whole-line
-#
-# # Edit the command line in vim
-# bindkey -M vicmd '^F' edit-command-line
-#
-# # Enable undo with 'u' and redo with 'U'
-# bindkey -M vicmd 'u' undo
-# bindkey -M vicmd 'U' redo
-#
-# # Enable toggle comment at start of line al la vim-commentary
-# bindkey -M vicmd 'gcc' vi-pound-insert
+# Enable backspace after returning to viins from vicmd mode
+bindkey '^?' backward-delete-char
+
+# Enable yank, change, and delete whole line with 'Y', 'cc', and 'dd'
+bindkey -M vicmd 'Y' vi-yank-whole-line
+
+# Edit the command line in vim
+bindkey -M vicmd '^F' edit-command-line
+
+# Enable undo with 'u' and redo with 'U'
+bindkey -M vicmd 'u' undo
+bindkey -M vicmd 'U' redo
+
+# Enable toggle comment at start of line al la vim-commentary
+bindkey -M vicmd 'gcc' vi-pound-insert
 
 # TODO: vi-pipe???
-
-# Enable accepting autosuggestions
-# bindkey '^O' forward-word
-# bindkey '^P' autosuggest-accept
 #
 # Enable substring history search with 'j' and 'k'
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
-# Replace '<Esc>h' with 'K' to view help
-bindkey -r '^[h'
-bindkey -M vicmd 'K' run-help
+# Enable accepting autosuggestions
+bindkey '^O' forward-word
+bindkey '^P' autosuggest-accept
 
-# Enable '<Shirt><Tab>' reverse order completions
-bindkey '^[[Z' reverse-menu-complete
+# Replace '<Esc>h' with 'K' to view help
+# bindkey -r '^[h'
+# bindkey -M vicmd 'K' run-help
+
+# Enable '<Shift><Tab>' reverse order completions
+# bindkey '^[[Z' reverse-menu-complete
 
 # Use editor to edit command line with '<Ctrl>V'
 autoload -U edit-command-line
@@ -188,7 +191,7 @@ frequent-directory Desktop "$HOME/Desktop"
 frequent-directory Documents "$HOME/Documents"
 frequent-directory Downloads "$HOME/Downloads"
 frequent-directory Development "$HOME/Development"
-frequent-directory Sandbox "$HOME/Sandbox"
+# frequent-directory Sandbox "$HOME/Sandbox"
 frequent-directory cache "$HOME/.cache"
 frequent-directory config "$HOME/.config"
 frequent-directory local "$HOME/.local"
@@ -233,5 +236,3 @@ for name in ${(k)aliases}; do
   done
 done
 
-# Load Starship prompt
-eval "$(starship init zsh)"
