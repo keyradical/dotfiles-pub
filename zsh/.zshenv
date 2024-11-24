@@ -78,10 +78,6 @@ export GIT_EDITOR=$EDITOR
 
 if command -v fzf &> /dev/null; then
   export FZF_DEFAULT_OPTS='--no-bold
-    --color=fg:#c5c9c5,fg+:#c5c9c5,bg:#000000,bg+:#393836
-    --color=hl:#8ea4a2,hl+:#8ea4a2,info:#afaf87,marker:#C8C093
-    --color=prompt:#C8C093,spinner:#8992a7,pointer:#FF9E3B,header:#87afaf
-    --color=gutter:#000000,border:#54546D,label:#aeaeae,query:#c5c9c5'
 fi
 
 # Use ~/.local for pip installs on macOS
