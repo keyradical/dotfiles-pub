@@ -77,7 +77,7 @@ fi
 export GIT_EDITOR=$EDITOR
 
 if command -v fzf &> /dev/null; then
-  export FZF_DEFAULT_OPTS='--no-bold
+  export FZF_DEFAULT_OPTS='--no-bold'
 fi
 
 # Use ~/.local for pip installs on macOS
