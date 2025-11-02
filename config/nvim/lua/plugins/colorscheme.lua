@@ -1,20 +1,12 @@
 return {
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    opts = {
-      flavour = "frappe", -- latte, frappe, macchiato, mocha
-      -- transparent = true,
-      -- styles = {
-      --   sidebars = "transparent",
-      --   floats = "transparent",
-      -- },
-    },
-  },
+  -- add gruvbox
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+
+  -- Configure LazyVim to load gruvbox
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin",
+      colorscheme = "catppuccin-frappe",
     },
   },
 }
