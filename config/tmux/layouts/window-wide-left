@@ -1,6 +1,0 @@
-#!/usr/bin/env -S tmux source-file
-
-split-window -h -l 43% -c '#{pane_current_path}'
-select-pane -t 1
-
-# vim: ft=tmux

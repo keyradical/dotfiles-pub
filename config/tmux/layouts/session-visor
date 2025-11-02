@@ -1,7 +1,0 @@
-#!/usr/bin/env -S tmux source-file
-
-rename-window home
-split-window -h htop
-select-pane -t visor:home.1
-
-# vim: ft=tmux
