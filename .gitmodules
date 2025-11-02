@@ -13,3 +13,6 @@
 [submodule "tmux/.config/tmux/plugins/tokyo-night-tmux"]
 	path = tmux/.config/tmux/plugins/tokyo-night-tmux
 	url = https://github.com/janoamaral/tokyo-night-tmux.git
+[submodule "dotbot"]
+	path = dotbot
+	url = https://github.com/anishathalye/dotbot
