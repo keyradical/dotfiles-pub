@@ -1,5 +1,5 @@
 [user]
 	name = Konrad Kusiak
-	email = konrad.kusiak@codeplay.com
+	email = kkusiak@modular.com
 [core]
-	editor = vim
+	editor = nvim
