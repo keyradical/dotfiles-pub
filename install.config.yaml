@@ -2,8 +2,6 @@
 
 - link:
     ~/.gitconfig: gitconfig
-    ~/.tmux.conf: tmux.conf
-    ~/.zshrc: zshrc
     ~/.config:
         path: config/
         create: true
