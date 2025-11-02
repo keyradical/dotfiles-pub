@@ -1,8 +1,8 @@
 nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/lazyvim.json
 
-config/tmux/plugins/*"
-!config/tmux/plugins/tpm"
+*config/tmux/plugins/*
+!config/tmux/plugins/tpm
 
 tags
 *~
