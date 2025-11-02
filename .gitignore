@@ -1,2 +1,17 @@
 nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/lazyvim.json
+
+config/tmux/plugins/*"
+!config/tmux/plugins/tpm"
+
+tags
+*~
+*.swp
+.netrwhist
+*bundle*
+*vim/sessions*
+*config/configstore*
+htoprc
+karabiner_*.json
+**/.claude/settings.local.json
+config/github-copilot/apps.json
