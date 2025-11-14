@@ -2,5 +2,5 @@
 
 To install dotfiles:
 
-* `git clone --recurse-submodules -b modularMac git@github.com:keyradical/dotfiles.git` .dotfiles
+* `git clone --recurse-submodules git@github.com:keyradical/dotfiles-pub.git` .dotfiles
 * `.dotfiles/install`
