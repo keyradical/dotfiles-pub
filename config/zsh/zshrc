@@ -19,6 +19,7 @@ source-plugin() {
 
 # Add neo vim to PATH
 export PATH="$PATH:/opt/nvim-linux64/bin"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 # Add cargo to PATH
 export PATH="$PATH":"/home/konrad/.local/share/cargo/bin"

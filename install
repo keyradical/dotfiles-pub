@@ -41,7 +41,7 @@ elif [[ "$OS" == "ubuntu" ]]; then
   sudo apt update -y
 
   # Install zsh, tmux, neovim
-  sudo apt install -y zsh tmux neovim
+  sudo apt install -y zsh tmux
 
   # Install neovim
   if ! command -v neovim &>/dev/null; then
@@ -69,9 +69,9 @@ fi
 if [[ "$SHELL" != *"zsh"* ]]; then
   echo "Changing default shell to zsh..."
   if [[ "$OS" == "macos" ]]; then
-    chsh -s $(which zsh)
+    sudo chsh -s $(which zsh)
   elif [[ "$OS" == "ubuntu" ]]; then
-    chsh -s $(which zsh)
+    sudo chsh -s $(which zsh)
   fi
   echo "Default shell changed to zsh. You may need to log out and log back in for this to take effect."
 fi
