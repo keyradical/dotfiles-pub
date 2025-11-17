@@ -17,6 +17,9 @@ source-plugin() {
   fi
 }
 
+# Node
+export PATH=~/.npm-global/bin:$PATH
+
 # Add neo vim to PATH
 export PATH="$PATH:/opt/nvim-linux64/bin"
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
