@@ -2,6 +2,21 @@
 
 - link:
     ~/.gitconfig: gitconfig
-    ~/.config:
-        path: config/
+    ~/.config/git:
+        path: config/git
+        create: true
+    ~/.config/kitty:
+        path: config/kitty
+        create: true
+    ~/.config/nvim:
+        path: config/nvim
+        create: true
+    ~/.config/starship.toml:
+        path: config/starship.toml
+        create: true
+    ~/.config/tmux:
+        path: config/tmux
+        create: true
+    ~/.config/zsh:
+        path: config/zsh
         create: true
