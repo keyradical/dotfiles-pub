@@ -84,7 +84,9 @@ for source in ${(k)symlinks}; do
       echo changed replace incorrect symlink $dest
     fi
   elif [ -f $dest ]; then
-    error symlink failed $dest exists but is a regular file
+    mv $dest $dest.backup
+    ln -s $source $dest
+    echo changed backed up $dest to $dest.backup and created symlink
   else
     ln -s $source $dest
     echo changed created symlink $dest
