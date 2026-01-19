@@ -8,5 +8,16 @@ vim.opt.relativenumber = false
 -- Enable mouse support
 vim.opt.mouse = "a"
 
--- Enable system clipboard integration
--- vim.opt.clipboard = "unnamedplus" -- Disabled in favor of OSC 52
+-- Enable system clipboard integration via OSC 52 (works over SSH)
+vim.opt.clipboard = "unnamedplus"
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+  },
+}
